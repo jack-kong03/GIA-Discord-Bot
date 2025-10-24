@@ -1,1 +1,22 @@
+# Environment
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Virtual environment
+venv/
+env/
+
+# Logs and data
+*.log
+*.txt
+*.csv
+
+# System
+.DS_Store
