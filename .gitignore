@@ -15,8 +15,7 @@ env/
 
 # Logs and data
 *.log
-*.txt
 *.csv
-
+daily_goals.txt
 # System
 .DS_Store
