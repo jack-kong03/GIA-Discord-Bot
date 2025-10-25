@@ -6,6 +6,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import os
 import requests
+from pytz import timezone
 
 load_dotenv()
 
@@ -17,7 +18,7 @@ intents = discord.Intents.default()
 intents.message_content = True  # Needed for reading messages
 
 bot = commands.Bot(command_prefix="!", intents=intents)
-scheduler = AsyncIOScheduler()
+scheduler = AsyncIOScheduler(timezone=timezone("Europe/London"))
 
 # === CORE FUNCTIONS ===
 
@@ -63,16 +64,39 @@ async def send_daily_checkin(channel):
     except asyncio.TimeoutError:
         await send_message(channel, "⏰ You didn’t reply in time — you can always type `!checkin` later!")
 
+async def send_motivation_quote(channel):
+    """Fetch and send a motivational quote from ZenQuotes API."""
+    try:
+        response = requests.get("https://zenquotes.io/api/random")
+        response.raise_for_status()
+        data = response.json()[0]
+        quote = data["q"]
+        author = data["a"]
+
+        embed = discord.Embed(
+            title="🌟 Motivation",
+            description=f"\"{quote}\"",
+            color=0x00ffcc
+        )
+        embed.set_footer(text=f"— {author}")
+        await channel.send(embed=embed)
+
+    except Exception as e:
+        print(f"Error fetching quote: {e}")
+        await send_message(channel, "⚠️ Could not fetch a motivational quote right now.")
+
 async def send_morning_routine(channel):
     await send_embed_message(channel, "🌅 Morning Routine", "Start your day with a positive mindset and set your intentions.")
 
 async def send_focus_session_1(channel):
+    await send_motivation_quote(channel)
     await send_embed_message(channel, "💻 Focus Session 1", "Deep work time — tackle your most important tasks.")
 
 async def send_lunch_break(channel):
     await send_embed_message(channel, "🍽️ Lunch Break", "Take a well-deserved break and refuel.")
 
 async def send_focus_session_2(channel):
+    await send_motivation_quote(channel)
     await send_embed_message(channel, "💻 Focus Session 2", "Continue your productive work — keep the momentum going.")
 
 async def send_gym_prep(channel):
@@ -85,6 +109,7 @@ async def send_evening_routine(channel):
     await send_embed_message(channel, "🌇 Evening Routine", "Wind down your work and prepare for the evening.")
 
 async def send_focus_session_3(channel):
+    await send_motivation_quote(channel)
     await send_embed_message(channel, "💻 Focus Session 3", "Final focused work session — wrap up tasks or plan ahead.")
 
 async def send_dinner_break(channel):
@@ -106,6 +131,7 @@ async def send_weekend_morning(channel):
     await send_embed_message(channel, "☀️ Weekend Morning", "Take it easy and enjoy a leisurely start.")
 
 async def send_weekend_project(channel):
+    await send_motivation_quote(channel)
     await send_embed_message(channel, "📚 Weekend Project", "Spend some time on personal projects or hobbies.")
 
 async def send_weekend_gym(channel):
